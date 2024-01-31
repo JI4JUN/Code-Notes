@@ -28,7 +28,7 @@ function Promise(executor) {
 
   function reject(reason) {
     setTimeout(() => {
-      if ((self.status = 'rejected')) {
+      if ((self.status = 'pending')) {
         self.status = 'rejected';
         self.data = reason;
         for (var i = 0; i < self.onRejectedCallback.length; i++) {
@@ -67,7 +67,7 @@ Promise.prototype.then = function (onResolved, onRejected) {
     typeof onRejected === 'function'
       ? onRejected
       : function (reason) {
-          return reason;
+          throw reason;
         };
 
   if (self.status === 'resolved') {
@@ -87,16 +87,16 @@ Promise.prototype.then = function (onResolved, onRejected) {
 
   // 和 status === 'resolved' 差不多
   if (self.status === 'rejected') {
-    setTimeout(() => {
-      return (promise2 = new Promise(function (resolve, reject) {
+    return (promise2 = new Promise(function (resolve, reject) {
+      setTimeout(() => {
         try {
           var x = onRejected(self.data);
           resolvePromise(promise2, x, resolve, reject);
         } catch (reason) {
           reject(reason);
         }
-      }));
-    });
+      });
+    }));
   }
 
   // 如果 promise1 的状态已经确定并且是 pending，我们将 onResolved 和 onRejected 注册到 onResolvedCallback 和 onRejectedCallback 中
