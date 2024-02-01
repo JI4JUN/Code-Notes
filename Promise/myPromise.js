@@ -8,9 +8,27 @@ var myPromise = (() => {
     self.callbacks = [];
     self.status = 'pending';
 
-    function resolve(value) {}
+    function resolve(value) {
+      setTimeout(() => {
+        if (self.status !== 'pending') return;
 
-    function reject(reason) {}
+        self.status = 'fulfilled';
+        self.data = value;
+
+        self.callbacks.forEach((cb) => cb.onResolved(value));
+      });
+    }
+
+    function reject(reason) {
+      setTimeout(() => {
+        if (self.status !== 'pending') return;
+
+        self.status = 'rejected';
+        self.data = reason;
+
+        self.callbacks.forEach((cb) => cb.onRejected(reason));
+      });
+    }
 
     try {
       executor(resolve, reject);
@@ -21,7 +39,35 @@ var myPromise = (() => {
 
   function resolvePromise(promise, x, resolve, reject) {}
 
-  Promise.prototype.then = (resolve, reject) => {};
+  Promise.prototype.then = (onFulfilled, onRejected) => {
+    onFulfilled =
+      typeof onFulfilled === 'function'
+        ? onFulfilled
+        : (value) => {
+            return value;
+          };
+    onRejected =
+      typeof onRejected === 'function'
+        ? onRejected
+        : (reason) => {
+            throw reason;
+          };
+
+    var self = this;
+    var promise2;
+
+    switch (self.status) {
+      case 'fulfilled': {
+      }
+      case 'rejected': {
+      }
+      case 'pending': {
+      }
+      default: {
+        throw new TypeError('known status ' + self.status);
+      }
+    }
+  };
 
   Promise.prototype.catch = (onRejected) => {};
 
