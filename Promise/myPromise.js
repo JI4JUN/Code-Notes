@@ -1,10 +1,10 @@
-var myPromise = (() => {
+let myPromise = (() => {
   function Promise(executor) {
     if (typeof executor !== 'function') {
       throw new TypeError('executor must be a function');
     }
 
-    var self = this;
+    let self = this;
     self.callbacks = [];
     self.status = 'pending';
 
@@ -38,8 +38,8 @@ var myPromise = (() => {
   }
 
   function resolvePromise(promise, x, resolve, reject) {
-    var then;
-    var thenCalledOrThrow = false;
+    let then;
+    let thenCalledOrThrow = false;
 
     if (promise === x)
       return reject(new TypeError('Chaining cycle detected for promise!'));
@@ -89,15 +89,15 @@ var myPromise = (() => {
             throw reason;
           };
 
-    var self = this;
-    var promise2;
+    let self = this;
+    let promise2;
 
     switch (self.status) {
       case 'fulfilled': {
         return (promise2 = new Promise((resolve, reject) => {
           setTimeout(() => {
             try {
-              var x = onFulfilled(self.data);
+              let x = onFulfilled(self.data);
               resolvePromise(promise2, x, resolve, reject);
             } catch (err) {
               reject(err);
@@ -109,7 +109,7 @@ var myPromise = (() => {
         return (promise2 = new Promise((resolve, reject) => {
           setTimeout(() => {
             try {
-              var x = onRejected(self.data);
+              let x = onRejected(self.data);
               resolvePromise(promise2, x, resolve, reject);
             } catch (err) {
               reject(err);
@@ -122,7 +122,7 @@ var myPromise = (() => {
           self.callbacks.push({
             onResolved: (value) => {
               try {
-                var x = onFulfilled(value);
+                let x = onFulfilled(value);
                 resolvePromise(promise2, x, resolve, reject);
               } catch (err) {
                 reject(err);
@@ -130,7 +130,7 @@ var myPromise = (() => {
             },
             onRejected: (reason) => {
               try {
-                var x = onRejected(reason);
+                let x = onRejected(reason);
                 resolvePromise(promise2, x, resolve, reject);
               } catch (err) {
                 reject(err);
@@ -145,15 +145,69 @@ var myPromise = (() => {
     }
   };
 
-  // Promise.prototype.catch = (onRejected) => {};
+  Promise.prototype.catch = (onRejected) => {
+    return this.then(null, onRejected);
+  };
 
-  // Promise.prototype.finally = (fn) => {};
+  Promise.all = (promises) => {
+    return new Promise((resolve, reject) => {
+      let resolveCounter = 0;
+      let promiseNum = promises.length;
+      let resolvedValues = new Array(promiseNum);
 
-  // Promise.all = () => {};
+      for (let i = 0; i < promiseNum; i++) {
+        Promise.resolve(promises[i]).then(
+          (value) => {
+            resolvedValues[i] = value;
+            resolveCounter++;
+            if (resolveCounter === promiseNum) return resolve(resolvedValues);
+          },
+          (reason) => reject(reason)
+        );
+      }
+    });
+  };
 
-  // Promise.allSettled = () => {};
+  Promise.allSettled = (promises) => {
+    return new Promise((resolve, _reject) => {
+      let resolveCounter = 0;
+      let promiseNum = promises.length;
+      let resolvedValues = new Array(promiseNum);
 
-  // Promise.any = () => {};
+      for (let i = 0; i < promiseNum; i++) {
+        Promise.resolve(promises[i]).then((value) => {
+          resolvedValues[i] = { status: 'fulfilled', value };
+          resolveCounter++;
+          if (resolveCounter === promiseNum) return resolve(resolvedValues);
+        }),
+          (reason) => {
+            resolvedValues[i] = { status: 'rejected', reason };
+            resolveCounter++;
+            if (resolveCounter === promiseNum) return resolve(resolvedValues);
+          };
+      }
+    });
+  };
+
+  Promise.any = (promises) => {
+    return new Promise((resolve, reject) => {
+      let resolveCounter = 0;
+      let promiseNum = promises.length;
+
+      for (let i = 0; i < promiseNum; i++) {
+        Promise.resolve(promises[i]).then(
+          (value) => {
+            return resolve(value);
+          },
+          (_reason) => {
+            resolveCounter++;
+            if (resolveCounter === promiseNum)
+              reject(new AggregateError('All promises were rejected'));
+          }
+        );
+      }
+    });
+  };
 
   // Promise.race = () => {};
 
@@ -161,12 +215,18 @@ var myPromise = (() => {
 
   // Promise.reject = () => {};
 
-  // Promise.resolve = () => {};
+  Promise.resolve = (value) => {
+    let promise = new Promise((resolve, reject) => {
+      resolvePromise(promise, value, resolve, reject);
+    });
+
+    return promise;
+  };
 
   // Promise.withResolvers = () => {};
 
   Promise.deferred = Promise.defer = function () {
-    var dfd = {};
+    let dfd = {};
     dfd.promise = new Promise(function (resolve, reject) {
       dfd.resolve = resolve;
       dfd.reject = reject;
