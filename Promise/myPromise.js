@@ -38,6 +38,10 @@ let myPromise = (() => {
   }
 
   function resolvePromise(promise, x, resolve, reject) {
+    console.log(
+      '🚀 ~ file: myPromise.js:41 ~ resolvePromise ~ promise:',
+      promise
+    );
     let then;
     let thenCalledOrThrow = false;
 
@@ -145,8 +149,18 @@ let myPromise = (() => {
     }
   };
 
-  Promise.prototype.catch = (onRejected) => {
+  Promise.prototype.catch = function (onRejected) {
     return this.then(null, onRejected);
+  };
+
+  Promise.prototype.finally = function (cb) {
+    return this.then(
+      (value) => Promise.resolve(cb()).then(() => value),
+      (reason) =>
+        Promise.resolve(cb()).then(() => {
+          throw reason;
+        })
+    );
   };
 
   Promise.all = (promises) => {
@@ -196,9 +210,7 @@ let myPromise = (() => {
 
       for (let i = 0; i < promiseNum; i++) {
         Promise.resolve(promises[i]).then(
-          (value) => {
-            return resolve(value);
-          },
+          (value) => resolve(value),
           (_reason) => {
             resolveCounter++;
             if (resolveCounter === promiseNum)
@@ -209,18 +221,24 @@ let myPromise = (() => {
     });
   };
 
-  // Promise.race = () => {};
+  Promise.race = (promises) => {
+    return new Promise((resolve, reject) => {
+      for (let promise of promises) {
+        Promise.resolve(promise).then(
+          (value) => resolve(value),
+          (reason) => reject(reason)
+        );
+      }
+    });
+  };
 
-  // Promise.allSettled = () => {};
-
-  // Promise.reject = () => {};
+  // Promise.reject = (reason) => {};
 
   Promise.resolve = (value) => {
-    let promise = new Promise((resolve, reject) => {
+    let promise;
+    return (promise = new Promise((resolve, reject) => {
       resolvePromise(promise, value, resolve, reject);
-    });
-
-    return promise;
+    }));
   };
 
   // Promise.withResolvers = () => {};
@@ -242,3 +260,17 @@ let myPromise = (() => {
 
   return Promise;
 })();
+
+/////////////////// test ///////////////////
+const p = new myPromise((resolve, reject) => {
+  console.info('starting...');
+
+  setTimeout(() => {
+    Math.random() > 0.5 ? resolve('success') : reject('fail');
+  }, 1000);
+});
+
+console.log(
+  '🚀 ~ file: myPromise.js:271 ~ Promise.resolve(p):',
+  Promise.resolve(p)
+);
