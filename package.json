@@ -1,0 +1,19 @@
+{
+  "name": "code-notes",
+  "version": "1.0.0",
+  "packageManager": "yarn@3.6.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "jest --watchAll --no-cache"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
