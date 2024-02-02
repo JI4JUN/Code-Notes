@@ -50,14 +50,14 @@ let myPromise = (() => {
         if (typeof then === 'function') {
           then.call(
             x,
-            function (y) {
+            (y) => {
               // then method's param onResolved
               if (thenCalledOrThrow) return;
               thenCalledOrThrow = true;
 
               return resolvePromise(promise, y, resolve, reject);
             },
-            function (r) {
+            (r) => {
               // then method's param onRejected
               if (thenCalledOrThrow) return;
               thenCalledOrThrow = true;
