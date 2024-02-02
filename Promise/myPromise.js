@@ -4,7 +4,7 @@ let myPromise = (() => {
       throw new TypeError('executor must be a function');
     }
 
-    let self = this;
+    const self = this;
     self.callbacks = [];
     self.status = 'pending';
 
@@ -38,10 +38,6 @@ let myPromise = (() => {
   }
 
   function resolvePromise(promise, x, resolve, reject) {
-    console.log(
-      '🚀 ~ file: myPromise.js:41 ~ resolvePromise ~ promise:',
-      promise
-    );
     let then;
     let thenCalledOrThrow = false;
 
@@ -93,7 +89,7 @@ let myPromise = (() => {
             throw reason;
           };
 
-    let self = this;
+    const self = this;
     let promise2;
 
     switch (self.status) {
@@ -166,7 +162,7 @@ let myPromise = (() => {
   Promise.all = (promises) => {
     return new Promise((resolve, reject) => {
       let resolveCounter = 0;
-      let promiseNum = promises.length;
+      const promiseNum = promises.length;
       let resolvedValues = new Array(promiseNum);
 
       for (let i = 0; i < promiseNum; i++) {
@@ -185,7 +181,7 @@ let myPromise = (() => {
   Promise.allSettled = (promises) => {
     return new Promise((resolve, _reject) => {
       let resolveCounter = 0;
-      let promiseNum = promises.length;
+      const promiseNum = promises.length;
       let resolvedValues = new Array(promiseNum);
 
       for (let i = 0; i < promiseNum; i++) {
@@ -206,7 +202,7 @@ let myPromise = (() => {
   Promise.any = (promises) => {
     return new Promise((resolve, reject) => {
       let resolveCounter = 0;
-      let promiseNum = promises.length;
+      const promiseNum = promises.length;
 
       for (let i = 0; i < promiseNum; i++) {
         Promise.resolve(promises[i]).then(
@@ -223,7 +219,7 @@ let myPromise = (() => {
 
   Promise.race = (promises) => {
     return new Promise((resolve, reject) => {
-      for (let promise of promises) {
+      for (const promise of promises) {
         Promise.resolve(promise).then(
           (value) => resolve(value),
           (reason) => reject(reason)
@@ -232,7 +228,9 @@ let myPromise = (() => {
     });
   };
 
-  // Promise.reject = (reason) => {};
+  Promise.reject = (reason) => {
+    return new Promise((_reslove, reject) => reject(reason));
+  };
 
   Promise.resolve = (value) => {
     let promise;
@@ -240,8 +238,6 @@ let myPromise = (() => {
       resolvePromise(promise, value, resolve, reject);
     }));
   };
-
-  // Promise.withResolvers = () => {};
 
   Promise.deferred = Promise.defer = function () {
     let dfd = {};
@@ -253,24 +249,7 @@ let myPromise = (() => {
     return dfd;
   };
 
-  try {
-    // CommonJS compliance
-    module.exports = Promise;
-  } catch (e) {}
+  module.exports = Promise;
 
   return Promise;
 })();
-
-/////////////////// test ///////////////////
-const p = new myPromise((resolve, reject) => {
-  console.info('starting...');
-
-  setTimeout(() => {
-    Math.random() > 0.5 ? resolve('success') : reject('fail');
-  }, 1000);
-});
-
-console.log(
-  '🚀 ~ file: myPromise.js:271 ~ Promise.resolve(p):',
-  Promise.resolve(p)
-);
