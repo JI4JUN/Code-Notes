@@ -34,8 +34,8 @@ test('Having a non-function as either parameter', async () => {
   }
 });
 
-test('Changing', async () => {
-  const p = await Promise.resolve('foo')
+test('Chaining', async () => {
+  const res1 = await Promise.resolve('foo')
     .then(
       (string) =>
         new Promise((resolve, _reject) => {
@@ -53,6 +53,16 @@ test('Changing', async () => {
       return string;
     })
     .then((string) => string);
+  expect(res1).toBe('foobar');
 
-  expect(p).toBe('foobar');
+  const p = new Promise((resolve, _reject) => resolve(1));
+  const res2 = await p
+    .then((value) => {
+      return value + 1;
+    })
+    .then((value) => value);
+  expect(res2).toBe(2);
+
+  const res3 = await p.then((value) => value);
+  expect(res3).toBe(1);
 });
