@@ -7,7 +7,9 @@ test('Using the then() method', async () => {
   });
   const res = await p1.then((value) => value);
   expect(res).toBe('Success');
+});
 
+test('Using the then() method', async () => {
   const p2 = new Promise((_resolve, reject) => {
     reject(new Error('Failure'));
   });
@@ -24,7 +26,9 @@ test('Having a non-function as either parameter', async () => {
     .then(2)
     .then((value) => value);
   expect(p).toBe(1);
+});
 
+test('Having a non-function as either parameter', async () => {
   try {
     await Promise.reject(1)
       .then(2, 2)
@@ -54,15 +58,17 @@ test('Chaining', async () => {
     })
     .then((string) => string);
   expect(res1).toBe('foobar');
+});
 
+test('Chaining', async () => {
   const p = new Promise((resolve, _reject) => resolve(1));
-  const res2 = await p
+  const res = await p
     .then((value) => {
       return value + 1;
     })
     .then((value) => value);
-  expect(res2).toBe(2);
+  expect(res).toBe(2);
 
-  const res3 = await p.then((value) => value);
-  expect(res3).toBe(1);
+  const res2 = await p.then((value) => value);
+  expect(res2).toBe(1);
 });
