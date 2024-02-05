@@ -72,3 +72,23 @@ test('Chaining', async () => {
   const res2 = await p.then((value) => value);
   expect(res2).toBe(1);
 });
+
+test('Chaining', async () => {
+  let res1 = '';
+
+  const res2 = await Promise.resolve()
+    .then(() => {
+      // 令 .then() 返回一个被拒绝的 promise
+      throw new Error('Error');
+    })
+    .then(
+      () => {
+        res1 = '不会被调用';
+      },
+      (error) => {
+        return error.message;
+      }
+    );
+  expect(res1 !== '不会被调用').toBeTruthy();
+  expect(res2).toBe('Error');
+});

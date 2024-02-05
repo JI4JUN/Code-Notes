@@ -41,8 +41,8 @@ let myPromise = (() => {
     let then;
     let thenCalledOrThrow = false;
 
-    if (promise === x)
-      return reject(new TypeError('Chaining cycle detected for promise!'));
+    // if (promise === x)
+    //   return reject(new TypeError('Chaining cycle detected for promise!'));
 
     if (x !== null && (typeof x === 'object' || typeof x === 'function')) {
       try {
