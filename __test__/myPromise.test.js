@@ -1,7 +1,7 @@
 const Promise = require('../Promise/myPromise.js');
 
 /************************ Test Promise.prototype.then ************************/
-test('Using the then() method', async () => {
+test('Using the then() method --- Success', async () => {
   const p1 = new Promise((resolve, _reject) => {
     resolve('Success');
   });
@@ -9,7 +9,7 @@ test('Using the then() method', async () => {
   expect(res).toBe('Success');
 });
 
-test('Using the then() method', async () => {
+test('Using the then() method --- Failure', async () => {
   const p2 = new Promise((_resolve, reject) => {
     reject(new Error('Failure'));
   });
@@ -21,14 +21,14 @@ test('Using the then() method', async () => {
   }
 });
 
-test('Having a non-function as either parameter', async () => {
+test('Having a non-function as either parameter --- Success', async () => {
   const p = await Promise.resolve(1)
     .then(2)
     .then((value) => value);
   expect(p).toBe(1);
 });
 
-test('Having a non-function as either parameter', async () => {
+test('Having a non-function as either parameter --- Failure', async () => {
   try {
     await Promise.reject(1)
       .then(2, 2)
@@ -38,7 +38,7 @@ test('Having a non-function as either parameter', async () => {
   }
 });
 
-test('Chaining', async () => {
+test('Chaining --- ', async () => {
   const res1 = await Promise.resolve('foo')
     .then(
       (string) =>
@@ -112,4 +112,25 @@ test('Chaining', async () => {
 
   //expect(res1).toBe('Error'); // note: 这里的 res2 会是 'Chaining cycle detected for promise!'，暂未找到原因
   expect(res2).toBe('Arrive Here');
+});
+
+test('Chaining', async () => {
+  const res = await Promise.reject()
+    .then(
+      () => 99,
+      () => 42
+    )
+    .then((solution) => solution);
+
+  expect(res).toBe(42);
+});
+
+test('Chaining', async () => {
+  function resolveLater(resolve, _reject) {
+    setTimeout(() => resolve(10), 1000);
+  }
+
+  function rejectLater(_resolve, reject) {
+    setTimeout(() => reject(new Error('Error')), 1000);
+  }
 });
