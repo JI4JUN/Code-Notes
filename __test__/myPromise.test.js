@@ -133,4 +133,28 @@ test('Chaining', async () => {
   function rejectLater(_resolve, reject) {
     setTimeout(() => reject(new Error('Error')), 1000);
   }
+
+  const p1 = Promise.resolve('foo');
+  const p2 = p1.then(() => {
+    // 此处返回一个 Promise，将在1秒后 resolve 为 10
+    return new Promise(resolveLater);
+  });
+  const res1 = await p2.then(
+    (v) => v,
+    (e) => e.message
+  );
+
+  const p3 = p1.then(() => {
+    // 此处返回一个 Promise，将在 1 秒后以 'Error' 被拒绝
+    return new Promise(rejectLater);
+  });
+  const res2 = await p3.then(
+    (v) => v,
+    (e) => e.message
+  );
+
+  expect(res1).toBe(10);
+  expect(res2).toBe('Error');
 });
+
+test('Asynchronicity of then()', () => {});
