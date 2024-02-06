@@ -161,6 +161,10 @@ let myPromise = (() => {
 
   Promise.all = (promises) => {
     return new Promise((resolve, reject) => {
+      if (!Array.isArray(promises)) {
+        return reject(new TypeError('object is not iterable'));
+      }
+
       const promiseNum = promises.length;
 
       let resolveCounter = 0;
@@ -180,7 +184,11 @@ let myPromise = (() => {
   };
 
   Promise.allSettled = (promises) => {
-    return new Promise((resolve, _reject) => {
+    return new Promise((resolve, reject) => {
+      if (!Array.isArray(promises)) {
+        return reject(new TypeError('object is not iterable'));
+      }
+
       const promiseNum = promises.length;
 
       let resolveCounter = 0;
@@ -203,6 +211,10 @@ let myPromise = (() => {
 
   Promise.any = (promises) => {
     return new Promise((resolve, reject) => {
+      if (!Array.isArray(promises)) {
+        return reject(new TypeError('object is not iterable'));
+      }
+
       let resolveCounter = 0;
 
       const promiseNum = promises.length;
@@ -222,6 +234,10 @@ let myPromise = (() => {
 
   Promise.race = (promises) => {
     return new Promise((resolve, reject) => {
+      if (!Array.isArray(promises)) {
+        return reject(new TypeError('object is not iterable'));
+      }
+
       for (const promise of promises) {
         Promise.resolve(promise).then(
           (value) => resolve(value),

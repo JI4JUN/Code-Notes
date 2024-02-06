@@ -197,3 +197,26 @@ test('Using Promise.all()', async () => {
     expect(error).toEqual(555)
   );
 });
+
+test('Using Promise.all() with async function', () => {
+  // 传入一个已经 resolved 的 Promise 数组，以尽可能快地触发 Promise.all
+  const resolvedPromisesArray = [Promise.resolve(33), Promise.resolve(44)];
+  const p = Promise.all(resolvedPromisesArray);
+  expect(p.status).toEqual('pending');
+
+  return expect(p).resolves.toEqual([33, 44]);
+});
+
+test('Using Promise.all() with async function', () => {
+  const mixedPromisesArray = [Promise.resolve(33), Promise.reject(44)];
+  const p = Promise.all(mixedPromisesArray);
+  expect(p.status).toEqual('pending');
+
+  return expect(p).rejects.toBe(44);
+});
+
+test('Using Promise.all() with async function', () => {
+  const p = Promise.all([]); // 将会立即解决
+  const p2 = Promise.all([1337, 'hi']); // 非 promise 值将被忽略，但求值是异步进行的
+  expect(p.status).toEqual('pending');
+});
