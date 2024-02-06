@@ -127,11 +127,11 @@ test('Chaining', async () => {
 
 test('Chaining', async () => {
   function resolveLater(resolve, _reject) {
-    setTimeout(() => resolve(10), 1000);
+    setTimeout(() => resolve(10), 100);
   }
 
   function rejectLater(_resolve, reject) {
-    setTimeout(() => reject(new Error('Error')), 1000);
+    setTimeout(() => reject(new Error('Error')), 100);
   }
 
   const p1 = Promise.resolve('foo');
@@ -157,4 +157,14 @@ test('Chaining', async () => {
   expect(res2).toBe('Error');
 });
 
-test('Asynchronicity of then()', () => {});
+test('Asynchronicity of then()', async () => {
+  const resolvedProm = Promise.resolve(33);
+  expect(await Promise.resolve(resolvedProm).then((v) => v)).toBe(33);
+
+  const thenProm = resolvedProm.then((value) => value + 1);
+
+  // 使用 setTimeout，我们可以将函数的执行推迟到调用栈为空的时刻
+  setTimeout(async () => {
+    expect(await Promise.resolve(thenProm).then((v) => v)).toBe(34);
+  });
+});
