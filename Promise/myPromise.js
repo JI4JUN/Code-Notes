@@ -161,8 +161,9 @@ let myPromise = (() => {
 
   Promise.all = (promises) => {
     return new Promise((resolve, reject) => {
-      let resolveCounter = 0;
       const promiseNum = promises.length;
+
+      let resolveCounter = 0;
       let resolvedValues = new Array(promiseNum);
 
       for (let i = 0; i < promiseNum; i++) {
@@ -180,8 +181,9 @@ let myPromise = (() => {
 
   Promise.allSettled = (promises) => {
     return new Promise((resolve, _reject) => {
-      let resolveCounter = 0;
       const promiseNum = promises.length;
+
+      let resolveCounter = 0;
       let resolvedValues = new Array(promiseNum);
 
       for (let i = 0; i < promiseNum; i++) {
@@ -202,6 +204,7 @@ let myPromise = (() => {
   Promise.any = (promises) => {
     return new Promise((resolve, reject) => {
       let resolveCounter = 0;
+
       const promiseNum = promises.length;
 
       for (let i = 0; i < promiseNum; i++) {

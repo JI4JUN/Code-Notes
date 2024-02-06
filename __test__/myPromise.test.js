@@ -1,6 +1,6 @@
 const Promise = require('../Promise/myPromise.js');
 
-/************************ Test Promise.prototype.then ************************/
+/************************ Test Promise.prototype.then() ************************/
 test('Using the then() method --- Success', async () => {
   const p1 = new Promise((resolve, _reject) => {
     resolve('Success');
@@ -167,4 +167,33 @@ test('Asynchronicity of then()', async () => {
   setTimeout(async () => {
     expect(await Promise.resolve(thenProm).then((v) => v)).toBe(34);
   });
+});
+
+/************************ Test Promise.all() ************************/
+test('Using Promise.all()', async () => {
+  const p1 = Promise.resolve(3);
+  const p2 = 1337;
+  const p3 = new Promise((resolve, _reject) => {
+    setTimeout(() => {
+      resolve('foo');
+    }, 100);
+  });
+
+  const res = await Promise.all([p1, p2, p3]).then((values) => values);
+  expect(res).toEqual([3, 1337, 'foo']);
+});
+
+test('Using Promise.all()', async () => {
+  // 所有的值都不是 Promise，因此返回的 Promise 将被兑现
+  const p = await Promise.all([1, 2, 3]);
+  expect(p).toEqual([1, 2, 3]);
+
+  // 输入中唯一的 Promise 已经被兑现，因此返回的 Promise 将被兑现
+  const p2 = await Promise.all([1, 2, 3, Promise.resolve(444)]);
+  expect(p2).toEqual([1, 2, 3, 444]);
+
+  // 一个（也是唯一的一个）输入 Promise 被拒绝，因此返回的 Promise 将被拒绝
+  return Promise.all([1, 2, 3, Promise.reject(555)]).catch((error) =>
+    expect(error).toEqual(555)
+  );
 });
