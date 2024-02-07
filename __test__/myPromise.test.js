@@ -198,7 +198,7 @@ test('Using Promise.all()', async () => {
   );
 });
 
-test('Using Promise.all() with async function', () => {
+test('Asynchronicity or synchronicity of Promise.all', () => {
   // 传入一个已经 resolved 的 Promise 数组，以尽可能快地触发 Promise.all
   const resolvedPromisesArray = [Promise.resolve(33), Promise.resolve(44)];
   const p = Promise.all(resolvedPromisesArray);
@@ -207,7 +207,7 @@ test('Using Promise.all() with async function', () => {
   return expect(p).resolves.toEqual([33, 44]);
 });
 
-test('Using Promise.all() with async function', () => {
+test('Asynchronicity or synchronicity of Promise.all', () => {
   const mixedPromisesArray = [Promise.resolve(33), Promise.reject(44)];
   const p = Promise.all(mixedPromisesArray);
   expect(p.status).toEqual('pending');
@@ -215,8 +215,44 @@ test('Using Promise.all() with async function', () => {
   return expect(p).rejects.toBe(44);
 });
 
-test('Using Promise.all() with async function', () => {
-  const p = Promise.all([]); // 将会立即解决
-  const p2 = Promise.all([1337, 'hi']); // 非 promise 值将被忽略，但求值是异步进行的
-  expect(p.status).toEqual('pending');
+test('Promise.all fail-fast behavior', async () => {
+  const p1 = new Promise((resolve, _reject) => {
+    setTimeout(() => resolve('一', 100));
+  });
+  const p2 = new Promise((resolve, _reject) => {
+    setTimeout(() => resolve('二', 200));
+  });
+  const p3 = new Promise((resolve, _reject) => {
+    setTimeout(() => resolve('三', 300));
+  });
+  const p4 = new Promise((resolve, _reject) => {
+    setTimeout(() => resolve('四', 400));
+  });
+  const p5 = new Promise((_resolve, reject) => {
+    reject(new Error('拒绝'));
+  });
+
+  await Promise.all([p1, p2, p3, p4, p5])
+    .then((values) => values)
+    .catch((err) => {
+      expect(err.message).toEqual('拒绝');
+    });
+});
+
+test('Promise.all fail-fast behavior', async () => {
+  const p1 = new Promise((resolve, _reject) => {
+    setTimeout(() => resolve('p1 延迟解决'), 100);
+  });
+
+  const p2 = new Promise((_resolve, reject) => {
+    reject(new Error('p2 立即拒绝'));
+  });
+
+  const res = await Promise.all([
+    p1.catch((error) => error),
+    p2.catch((error) => error)
+  ]).then((values) => values);
+
+  expect(res[0]).toBe('p1 延迟解决');
+  expect(res[1].message).toBe('p2 立即拒绝');
 });
