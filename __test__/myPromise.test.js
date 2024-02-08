@@ -256,3 +256,22 @@ test('Promise.all fail-fast behavior', async () => {
   expect(res[0]).toBe('p1 延迟解决');
   expect(res[1].message).toBe('p2 立即拒绝');
 });
+
+/************************ Test Promise.allSettled() ************************/
+test('Using Promise.allSettled()', async () => {
+  const res = await Promise.allSettled([
+    Promise.resolve(33),
+    new Promise((resolve) => setTimeout(() => resolve(66), 0)),
+    99,
+    Promise.reject(new Error('an error'))
+  ]).then((values) => {
+    return values;
+  });
+
+  expect(res).toEqual([
+    { status: 'fulfilled', value: 33 },
+    { status: 'fulfilled', value: 66 },
+    { status: 'fulfilled', value: 99 },
+    { status: 'rejected', reason: 'an error' }
+  ]);
+});

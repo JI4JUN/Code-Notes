@@ -198,13 +198,17 @@ let myPromise = (() => {
         Promise.resolve(promises[i]).then((value) => {
           resolvedValues[i] = { status: 'fulfilled', value };
           resolveCounter++;
-          if (resolveCounter === promiseNum) return resolve(resolvedValues);
+          complete();
         }),
           (reason) => {
             resolvedValues[i] = { status: 'rejected', reason };
             resolveCounter++;
-            if (resolveCounter === promiseNum) return resolve(resolvedValues);
+            complete();
           };
+      }
+
+      function complete() {
+        if (resolveCounter === promiseNum) return resolve(resolvedValues);
       }
     });
   };
