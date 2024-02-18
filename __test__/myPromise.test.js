@@ -275,3 +275,28 @@ test('Using Promise.allSettled()', async () => {
     { status: 'rejected', reason: Error('an error') }
   ]);
 });
+
+/************************ Test Promise.any() ************************/
+test('Using Promise.any()', async () => {
+  const pErr = new Promise((_resolve, reject) => reject('Always fails'));
+  const pSlow = new Promise((resolve, _reject) =>
+    setTimeout(resolve, 200, 'Done eventually')
+  );
+  const pFast = new Promise((resolve, _reject) =>
+    setTimeout(resolve, 100, 'Done quick')
+  );
+
+  const res = await Promise.any([pErr, pSlow, pFast]).then((value) => value);
+
+  expect(res).toBe('Done quick');
+});
+
+test('Rejections with AggregateError', async () => {
+  const failure = new Promise((_resolve, reject) => {
+    reject('Always fails');
+  });
+
+  const res = await Promise.any([failure]).catch((err) => err);
+
+  expect(res).toEqual(AggregateError(''));
+});
