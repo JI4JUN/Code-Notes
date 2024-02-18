@@ -4,6 +4,10 @@ let myPromise = (() => {
       throw new TypeError('executor must be a function');
     }
 
+    if (!(this instanceof Promise)) {
+      return new Promise(executor);
+    }
+
     const self = this;
     self.callbacks = [];
     self.status = 'pending';
@@ -75,7 +79,7 @@ let myPromise = (() => {
         return reject(err);
       }
     } else {
-      resolve(x);
+      return resolve(x);
     }
   }
 
@@ -100,7 +104,7 @@ let myPromise = (() => {
               let x = onFulfilled(self.data);
               resolvePromise(promise2, x, resolve, reject);
             } catch (err) {
-              reject(err);
+              return reject(err);
             }
           });
         }));
@@ -112,7 +116,7 @@ let myPromise = (() => {
               let x = onRejected(self.data);
               resolvePromise(promise2, x, resolve, reject);
             } catch (err) {
-              reject(err);
+              return reject(err);
             }
           });
         }));
@@ -125,7 +129,7 @@ let myPromise = (() => {
                 let x = onFulfilled(value);
                 resolvePromise(promise2, x, resolve, reject);
               } catch (err) {
-                reject(err);
+                return reject(err);
               }
             },
             onRejected: (reason) => {
@@ -133,7 +137,7 @@ let myPromise = (() => {
                 let x = onRejected(reason);
                 resolvePromise(promise2, x, resolve, reject);
               } catch (err) {
-                reject(err);
+                return reject(err);
               }
             }
           });
@@ -190,24 +194,19 @@ let myPromise = (() => {
       }
 
       const promiseNum = promises.length;
-
       let resolveCounter = 0;
       let resolvedValues = new Array(promiseNum);
 
       for (let i = 0; i < promiseNum; i++) {
-        Promise.resolve(promises[i]).then((value) => {
-          resolvedValues[i] = { status: 'fulfilled', value };
-          resolveCounter++;
-          complete();
-        }),
-          (reason) => {
-            resolvedValues[i] = { status: 'rejected', reason };
-            resolveCounter++;
-            complete();
-          };
+        Promise.resolve(promises[i]).then(
+          (value) => addToResults(i, { status: 'fulfilled', value }),
+          (reason) => addToResults(i, { status: 'rejected', reason })
+        );
       }
 
-      function complete() {
+      function addToResults(index, element) {
+        resolvedValues[index] = element;
+        resolveCounter++;
         if (resolveCounter === promiseNum) return resolve(resolvedValues);
       }
     });

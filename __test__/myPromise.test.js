@@ -272,6 +272,6 @@ test('Using Promise.allSettled()', async () => {
     { status: 'fulfilled', value: 33 },
     { status: 'fulfilled', value: 66 },
     { status: 'fulfilled', value: 99 },
-    { status: 'rejected', reason: 'an error' }
+    { status: 'rejected', reason: Error('an error') }
   ]);
 });
