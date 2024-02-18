@@ -300,3 +300,87 @@ test('Rejections with AggregateError', async () => {
 
   expect(res).toEqual(AggregateError(''));
 });
+
+/************************ Test Promise.prototype.catch() ************************/
+test('Using and chaining the catch() method', async () => {
+  let res;
+  let res2;
+  let res3;
+  let res4;
+  let res5;
+  let res6;
+
+  const p1 = new Promise((resolve, _reject) => resolve('Success'));
+  const p2 = new Promise((resolve, _reject) => resolve('Success'));
+
+  await p1
+    .then((value) => {
+      res = value;
+      throw new Error('oh, no!');
+    })
+    .catch((e) => (res2 = e.message))
+    .then(
+      () => (res3 = 1),
+      () => (res3 = 2)
+    );
+  await p2
+    .then((value) => {
+      res4 = value;
+      return Promise.reject('oh, no!');
+    })
+    .catch((e) => (res5 = e))
+    .then(
+      () => (res6 = 1),
+      () => (res6 = 2)
+    );
+
+  expect(res).toBe('Success');
+  expect(res2).toBe('oh, no!');
+  expect(res3).toBe(1);
+  expect(res4).toBe('Success');
+  expect(res5).toBe('oh, no!');
+  expect(res6).toBe(1);
+});
+
+test('Gotchas when throwing errors', () => {
+  const p = new Promise((_resolve, _reject) => {
+    throw new Error('Uh-oh!');
+  });
+
+  return p.catch((e) => expect(e).toEqual(Error('Uh-oh!')));
+});
+
+/************************ Test Promise.prototype.finally() ************************/
+test('Using finally()', async () => {
+  let res1;
+  let res2 = false;
+  let res3;
+  let res4 = false;
+
+  const p1 = new Promise((resolve, _reject) => {
+    resolve('success');
+  });
+  const p2 = new Promise((_resolve, reject) => {
+    reject(new Error('failure'));
+  });
+
+  await p1
+    .then((value) => {
+      res1 = value;
+    })
+    .finally(() => {
+      res2 = true;
+    });
+  await p2
+    .catch((err) => {
+      res3 = err.message;
+    })
+    .finally(() => {
+      res4 = true;
+    });
+
+  expect(res1).toBe('success');
+  expect(res2).toBe(true);
+  expect(res3).toBe('failure');
+  expect(res4).toBe(true);
+});

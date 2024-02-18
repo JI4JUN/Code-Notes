@@ -153,13 +153,26 @@ let myPromise = (() => {
     return this.then(null, onRejected);
   };
 
+  // Promise.prototype.finally = function (cb) {
+  //   return this.then(
+  //     (value) => Promise.resolve(cb()).then(() => value),
+  //     (reason) =>
+  //       Promise.resolve(cb()).then(() => {
+  //         throw reason;
+  //       })
+  //   );
+  // };
+
   Promise.prototype.finally = function (cb) {
     return this.then(
-      (value) => Promise.resolve(cb()).then(() => value),
-      (reason) =>
-        Promise.resolve(cb()).then(() => {
-          throw reason;
-        })
+      function (value) {
+        setTimeout(cb);
+        return value;
+      },
+      function (reason) {
+        setTimeout(cb);
+        throw reason;
+      }
     );
   };
 
