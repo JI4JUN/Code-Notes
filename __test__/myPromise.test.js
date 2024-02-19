@@ -416,3 +416,51 @@ test('Using Promise.race()', async () => {
   expect(res2).toBe('three');
   expect(res3).toBe('six');
 });
+
+test('Asynchronicity of Promise.race', () => {
+  const resolvedPromisesArray = [Promise.resolve(33), Promise.resolve(44)];
+  const p = Promise.race(resolvedPromisesArray);
+
+  expect(p.status).toBe('pending');
+
+  return expect(p).resolves.toEqual(33);
+});
+
+test('Asynchronicity of Promise.race', () => {
+  const foreverPendingPromise = Promise.race([]);
+
+  return expect(foreverPendingPromise.status).toBe('pending');
+});
+
+test('Asynchronicity of Promise.race', async () => {
+  const foreverPendingPromise = Promise.race([]);
+  const alreadyFulfilledProm = await Promise.resolve(100);
+
+  const arr = [
+    foreverPendingPromise,
+    alreadyFulfilledProm,
+    'non-Promise value'
+  ];
+  const arr2 = [
+    foreverPendingPromise,
+    'non-Promise value',
+    Promise.resolve(100)
+  ];
+  const p = await Promise.race(arr);
+  const p2 = await Promise.race(arr2);
+
+  expect(p).toBe(100);
+  expect(p2).toBe('non-Promise value');
+});
+
+test('Using Promise.race() to detect the status of a promise', () => {
+  function promiseState(promise) {
+    const pendingState = { status: 'pending' };
+
+    return Promise.race([promise, pendingState]).then(
+      (value) =>
+        value === pendingState ? value : { status: 'fulfilled', value },
+      (reason) => ({ status: 'rejected', reason })
+    );
+  }
+});
