@@ -269,9 +269,9 @@ let myPromise = (() => {
 
   Promise.resolve = (value) => {
     let promise;
-    return (promise = new Promise((resolve, reject) => {
-      resolvePromise(promise, value, resolve, reject);
-    }));
+    return (promise = new Promise((resolve, reject) =>
+      resolvePromise(promise, value, resolve, reject)
+    ));
   };
 
   Promise.deferred = Promise.defer = function () {

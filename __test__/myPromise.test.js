@@ -384,3 +384,35 @@ test('Using finally()', async () => {
   expect(res3).toBe('failure');
   expect(res4).toBe(true);
 });
+
+/************************ Test Promise.prototype.race() ************************/
+test('Using Promise.race()', async () => {
+  function sleep(time, value, state) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        return state === 'fulfill' ? resolve(value) : reject(new Error(value));
+      }, time);
+    });
+  }
+
+  const p1 = sleep(200, 'one', 'fulfill');
+  const p2 = sleep(100, 'two', 'fulfill');
+  const p3 = sleep(100, 'three', 'fulfill');
+  const p4 = sleep(200, 'four', 'reject');
+  const p5 = sleep(300, 'five', 'fulfill'); // time 设置为大于 210 时，p5 会先于 p6 兑现。暂时还未找到原因
+  const p6 = sleep(100, 'six', 'reject');
+
+  const res1 = await Promise.race([p1, p2]).then((value) => value);
+  const res2 = await Promise.race([p3, p4]).then(
+    (value) => value,
+    (_error) => {}
+  );
+  const res3 = await Promise.race([p5, p6]).then(
+    (_value) => _value,
+    (error) => error.message
+  );
+
+  expect(res1).toBe('two');
+  expect(res2).toBe('three');
+  expect(res3).toBe('six');
+});
