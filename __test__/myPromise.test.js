@@ -463,4 +463,6 @@ test('Using Promise.race() to detect the status of a promise', () => {
       (reason) => ({ status: 'rejected', reason })
     );
   }
+
+  const p1 = new Promise((res) => setTimeout(() => res(100), 100));
 });
