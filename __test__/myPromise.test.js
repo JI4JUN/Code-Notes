@@ -57,6 +57,7 @@ test('Chaining --- ', async () => {
       return string;
     })
     .then((string) => string);
+
   expect(res1).toBe('foobar');
 });
 
@@ -453,16 +454,42 @@ test('Asynchronicity of Promise.race', async () => {
   expect(p2).toBe('non-Promise value');
 });
 
-test('Using Promise.race() to detect the status of a promise', () => {
-  function promiseState(promise) {
-    const pendingState = { status: 'pending' };
+// notes: 未找到正确的单元测试方法
+// test('Using Promise.race() to detect the status of a promise', () => {
+//   function promiseState(promise) {
+//     const pendingState = { status: 'pending' };
 
-    return Promise.race([promise, pendingState]).then(
-      (value) =>
-        value === pendingState ? value : { status: 'fulfilled', value },
-      (reason) => ({ status: 'rejected', reason })
-    );
-  }
+//     return Promise.race([promise, pendingState]).then(
+//       (value) =>
+//         value === pendingState ? value : { status: 'fulfilled', value },
+//       (reason) => ({ status: 'rejected', reason })
+//     );
+//   }
 
-  const p1 = new Promise((res) => setTimeout(() => res(100), 100));
-});
+//   const p1 = new Promise((res) => setTimeout(() => res(100), 100));
+//   const p2 = new Promise((res) => setTimeout(() => res(200), 200));
+//   const p3 = new Promise((_res, rej) => setTimeout(() => rej(300), 100));
+
+//   let res1;
+//   let res2;
+//   let res3;
+
+//   async function getStates() {
+//     res1 = await promiseState(p1);
+//     res2 = await promiseState(p2);
+//     res3 = await promiseState(p3);
+//   }
+
+//   function fun() {
+//     getStates();
+//     setTimeout(() => getStates(), 100);
+//   }
+
+//   jest.useFakeTimers();
+//   fun();
+//   jest.runAllTimers();
+
+//   expect(res1).toEqual({ status: 'fulfilled', value: 100 });
+//   expect(res2).toEqual({ status: 'pending' });
+//   expect(res3).toEqual({ status: 'rejected', reason: 300 });
+// });

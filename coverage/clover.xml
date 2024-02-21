@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1708354723504" clover="3.2.0">
-  <project timestamp="1708354723504" name="All files">
+<coverage generated="1708486656003" clover="3.2.0">
+  <project timestamp="1708486656003" name="All files">
     <metrics statements="290" coveredstatements="257" conditionals="85" coveredconditionals="73" methods="21" coveredmethods="20" elements="396" coveredelements="350" complexity="0" loc="290" ncloc="290" packages="1" files="1" classes="1"/>
     <file name="myPromise.js" path="D:\learning\javascript\Code-Notes\Promise\myPromise.js">
       <metrics statements="290" coveredstatements="257" conditionals="85" coveredconditionals="73" methods="21" coveredmethods="20"/>
