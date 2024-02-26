@@ -525,3 +525,27 @@ test('Calling reject() on a non-Promise constructor', () => {
 
   return expect(res).rejects.toBe('foo');
 });
+
+/************************ Test Promise.resolve() ************************/
+test('Using the static Promise.resolve method', () => {
+  const res = Promise.resolve('Success').then(
+    (value) => value,
+    (reason) => reason
+  );
+
+  return expect(res).resolves.toBe('Success');
+});
+
+test('Resolving an array', () => {
+  const p = Promise.resolve([1, 2, 3]);
+  const res = p.then((v) => v[0]);
+
+  return expect(res).resolves.toBe(1);
+});
+
+test('Resolving anthor Promise', () => {
+  const original = Promise.resolve(33);
+  const cast = Promise.resolve(original);
+
+  expect(original === cast).toBe(true);
+});

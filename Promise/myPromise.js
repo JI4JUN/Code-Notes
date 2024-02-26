@@ -268,6 +268,8 @@ let myPromise = (() => {
   };
 
   Promise.resolve = (value) => {
+    if (value instanceof Promise) return value;
+
     let promise;
     return (promise = new Promise((resolve, reject) =>
       resolvePromise(promise, value, resolve, reject)
