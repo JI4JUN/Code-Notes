@@ -549,3 +549,105 @@ test('Resolving anthor Promise', () => {
 
   expect(original === cast).toBe(true);
 });
+
+test('Resolving thenables and throwing Errors', () => {
+  const p1 = Promise.resolve({
+    then(onFulfill, _onReject) {
+      onFulfill('fulfilled');
+    }
+  });
+
+  expect(p1 instanceof Promise).toBe(true);
+
+  const res = p1.then(
+    (v) => v,
+    (_e) => {}
+  );
+
+  return expect(res).resolves.toBe('fulfilled');
+});
+
+test('Resolving thenables and throwing Errors', () => {
+  const p2 = Promise.resolve({
+    then() {
+      throw new TypeError('Throwing');
+    }
+  });
+  const res = p2.then(
+    (_v) => {},
+    (e) => e
+  );
+
+  return expect(res).resolves.toEqual(TypeError('Throwing'));
+});
+
+test('Resolving thenables and throwing Errors', () => {
+  const p3 = Promise.resolve({
+    then(onFulfilled) {
+      onFulfilled('Resolving');
+      throw new TypeError('Throwing');
+    }
+  });
+  const res = p3.then(
+    (v) => v,
+    (_e) => {}
+  );
+
+  return expect(res).resolves.toBe('Resolving');
+});
+
+test('Resolving thenables and throwing Errors', () => {
+  const thenable = {
+    then(onFulfilled, _onRejected) {
+      onFulfilled({
+        then(onFulfilled, _onRejected) {
+          onFulfilled(42);
+        }
+      });
+    }
+  };
+
+  const res = Promise.resolve(thenable).then((v) => v);
+
+  return expect(res).resolves.toBe(42);
+});
+
+test('Calling resolve() on a non-Promise constructor', () => {
+  class NotPromise {
+    constructor(executor) {
+      executor(
+        (value) => value,
+        (reason) => reason
+      );
+    }
+  }
+
+  const res = Promise.resolve.call(NotPromise, 'foo');
+
+  return expect(res).resolves.toBe('foo');
+});
+
+test('Calling resolve() on a non-Promise constructor', () => {
+  class NotPromise {
+    constructor(executor) {
+      executor(
+        (value) => value,
+        (reason) => reason
+      );
+    }
+  }
+
+  const thenable = {
+    then(onFulfilled, _onRejected) {
+      onFulfilled({
+        then(onFulfilled, _onRejected) {
+          onFulfilled(42);
+        }
+      });
+    }
+  };
+
+  const res = Promise.resolve.call(NotPromise, thenable);
+
+  return expect(res).resolves.toBe(42);
+});
