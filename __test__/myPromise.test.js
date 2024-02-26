@@ -493,3 +493,35 @@ test('Asynchronicity of Promise.race', async () => {
 //   expect(res2).toEqual({ status: 'pending' });
 //   expect(res3).toEqual({ status: 'rejected', reason: 300 });
 // });
+
+/************************ Test Promise.reject() ************************/
+test('Using the static Promise.reject() method', async () => {
+  const res = await Promise.reject(new Error('fail')).then(
+    () => {},
+    (error) => error
+  );
+
+  expect(res).toEqual(Error('fail'));
+});
+
+test('Rejecting with a promise', () => {
+  const p = Promise.resolve(1);
+  const rejected = Promise.reject(p);
+
+  expect(rejected === p).toEqual(false);
+});
+
+test('Calling reject() on a non-Promise constructor', () => {
+  class NotPromise {
+    constructor(executor) {
+      executor(
+        (value) => value,
+        (reason) => reason
+      );
+    }
+  }
+
+  const res = Promise.reject.call(NotPromise, 'foo');
+
+  return expect(res).rejects.toBe('foo');
+});
